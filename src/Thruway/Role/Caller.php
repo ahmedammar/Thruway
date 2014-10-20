@@ -154,7 +154,15 @@ class Caller extends AbstractRole
 
         $session->sendMessage($callMsg);
 
+        $session->getLoop()->addTimer(60, function () use ($requestId) {
+                if (isset($this->callRequests[$requestId])) {
+                    $futureResult = $this->callRequests[$requestId]['future_result'];
+                    $futureResult->reject("timeout");
+                    unset($this->callRequests[$requestId]);
+                }
+            });
+
         return $futureResult->promise();
     }
 
-} 
+}

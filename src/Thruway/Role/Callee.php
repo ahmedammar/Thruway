@@ -141,9 +141,10 @@ class Callee extends AbstractRole
                     }
 
                     try {
-                        $results = $registration["callback"]($msg->getArguments(), $msg->getArgumentsKw(), $msg->getDetails());
-
-                        if ($results instanceof Promise) {
+                        $results = $registration["callback"]($msg->getArguments(), $msg->getArgumentsKw(), $msg->getDetails(), $msg);
+                        if ($results instanceof ErrorMessage) {
+                            $this->processResultAsError($results, $session);
+                        } else if ($results instanceof Promise) {
                             $this->processResultAsPromise($results, $msg, $session, $registration);
                         } else {
                             $this->processResultAsArray($results, $msg, $session);
@@ -163,6 +164,19 @@ class Callee extends AbstractRole
             }
         }
 
+    }
+
+  /**
+     *  Process a result as a error
+     *
+     * @param \React\Promise\Promise $promise
+     * @param \Thruway\Message\InvocationMessage $msg
+     * @param \Thruway\ClientSession $session
+     * @param array $registration
+     */
+    private function processResultAsError(ErrorMessage $errorMsg, ClientSession $session)
+    {
+        $session->sendMessage($errorMsg);
     }
 
     /**
@@ -363,7 +377,7 @@ class Callee extends AbstractRole
 
     /**
      * process unregister
-     * 
+     *
      * @param \Thruway\ClientSession $session
      * @param string $Uri
      * @throws \Exception
@@ -464,4 +478,4 @@ class Callee extends AbstractRole
         $this->logger = $logger;
     }
 
-} 
+}
