@@ -131,7 +131,7 @@ class Caller extends AbstractRole
      * @param mixed $options
      * @return \React\Promise\Promise
      */
-    public function call(ClientSession $session, $procedureName, $arguments = null, $argumentsKw = null, $options = null)
+    public function call(ClientSession $session, $procedureName, $arguments = null, $argumentsKw = null, $options = null, $timeout = 60)
     {
         //This promise gets resolved in Caller::processResult
         $futureResult = new Deferred();
@@ -154,7 +154,7 @@ class Caller extends AbstractRole
 
         $session->sendMessage($callMsg);
 
-        $session->getLoop()->addTimer(60, function () use ($requestId) {
+        $session->getLoop()->addTimer($timeout, function () use ($requestId) {
                 if (isset($this->callRequests[$requestId])) {
                     $futureResult = $this->callRequests[$requestId]['future_result'];
                     $futureResult->reject("timeout");

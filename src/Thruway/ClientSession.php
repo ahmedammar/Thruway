@@ -93,9 +93,9 @@ class ClientSession extends AbstractSession
      * @param array|mixed $options
      * @return \React\Promise\Promise
      */
-    public function call($procedureName, $arguments = null, $argumentsKw = null, $options = null)
+    public function call($procedureName, $arguments = null, $argumentsKw = null, $options = null, $timeout = 60)
     {
-        return $this->peer->getCaller()->call($this, $procedureName, $arguments, $argumentsKw, $options);
+        return $this->peer->getCaller()->call($this, $procedureName, $arguments, $argumentsKw, $options, $timeout);
     }
 
     /**
